@@ -4,4 +4,7 @@ let input = () : string => _cin_.length === 0 ? "" : _cin_.shift()!;
 let write = (text: any, end:string="\n")=> process.stdout.write("" + text + end);
 export {};
 
+
+
+
 write("qxcode");
