@@ -1,0 +1,56 @@
+{
+    "expanded": [
+        "caminho-base",
+        "main_op"
+    ],
+    "tasks": {
+        "tres": "10:0:0",
+        "resto": "10:0:0",
+        "media": "10:0:0",
+        "sobrou": "0:0:100",
+        "patas": "0:0:100",
+        "pedra": "0:0:100"
+    },
+    "flags": {
+        "minimum": 0,
+        "reward": 0,
+        "percent": 0,
+        "admin": 0,
+        "config": 0,
+        "skills": 0
+    },
+    "new_items": [
+        "selecao_circular",
+        "vetor_manipulacao",
+        "matrizes-",
+        "selecao_math",
+        "selecao_modulo",
+        "vetor_conversao",
+        "selecao_busca",
+        "main_sel_log",
+        "selecao-",
+        "vetor_proximidade",
+        "vetores-",
+        "strings_iv",
+        "op_math",
+        "vetor_contagem",
+        "extra-",
+        "main_sel_mod",
+        "selecao_manipulacao",
+        "strings-",
+        "strings_vi",
+        "fundamentos",
+        "gr_mat",
+        "strings_v",
+        "laco_math",
+        "vetor_ordenacao",
+        "selecao_intervalo",
+        "vetor_math",
+        "main_repii",
+        "selecao_conversao",
+        "strings",
+        "vetores"
+    ],
+    "lang": "ts",
+    "index": 2
+}
