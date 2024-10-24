@@ -12,10 +12,6 @@ echo "alias play='tko play'" >> ~/.bashrc
 echo "alias run='tko run'" >> ~/.bashrc
 echo "" >> ~/.bashrc
 
-# Instala pacotes via apt
-sudo apt-get update
-sudo apt-get install -y graphviz
-
 # Instala eza
 wget -c https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -O - | tar xz
 sudo chmod +x eza
@@ -24,9 +20,7 @@ sudo mv eza /usr/local/bin/eza
 
 # Instala pacotes Python
 pip install tko
-tko config --root .
-tko config --lang ts
-tko config --hud 0
+
 
 # Baixa e instala a FiraCode Nerd Font
 #mkdir -p ~/.local/share/fonts
