@@ -1,16 +1,8 @@
 #!/bin/bash
 
 
-
-# Cria o arquivo de aliases, se ainda não existir
-
-echo "" >> ~/.bashrc
-echo "alias update='pip install tko --upgrade'" >> ~/.bashrc
-echo "" >> ~/.bashrc
-
 # Instala pacotes Python
-pip install tko
-
+pipx install tko
 
 # Instala pacotes Node.js globais
 npm install -g typescript esbuild
