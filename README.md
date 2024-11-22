@@ -1,6 +1,7 @@
 ---
 aluno: "David Sena"
-matrícula: "????????"
+matrícula: "Digite sua matrícula aqui por obséquio"
+quote: "Que a ferrugem me coma a espingarda se o aluno não preencher esses dados"
 ---
 
 # Bom trabalho
