@@ -1,7 +1,6 @@
 ---
-aluno: "David Sena"
-matrícula: "Digite sua matrícula aqui por obséquio"
-quote: "Que a ferrugem me coma a espingarda se o aluno não preencher esses dados"
+nomeAluno: "Seu nome"
+matricula: "Digite sua matrícula aqui por obséquio"
 ---
 
 # Bom trabalho
@@ -33,6 +32,16 @@ pipx upgrade tko
 - `git status`: Mostra o estado atual do repositório
 - `git log`: Mostra o histórico de commits
 - `git clone <url>`: Clona um repositório remoto para uma pasta local
+
+## Resolvendo Conflitos
+
+- Antes de trabalhar num respositório, lembre de fazer o pull.
+- Se quando for fazer o push, der erro, tente as seguintes opções.
+  - git pull --ff-only
+  - git rebase
+  - git pull --no-rebase
+- Se não der certo, cole o erro no chatgpt e siga as instruções.
+- Se não der certo, mande o erro no grupo do telegram.
 
 ## Lembre-se
 
