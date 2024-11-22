@@ -32,3 +32,7 @@ pipx upgrade tko
 - `git status`: Mostra o estado atual do repositório
 - `git log`: Mostra o histórico de commits
 - `git clone <url>`: Clona um repositório remoto para uma pasta local
+
+## Lembre-se
+
+- Sua consciência é a melhor ferramenta contra o plágio.
