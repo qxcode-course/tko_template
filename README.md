@@ -1,6 +1,6 @@
 ---
 aluno: "Digite seu nome aqui"
-matricula: "digite_sua_matricula_aqui"
+mat: "Digite sua matrícula aqui"
 ---
 
 # Bom trabalho
