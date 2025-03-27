@@ -1,6 +1,6 @@
 {
   "name": "Template with Installation Script",
-  "image": "mcr.microsoft.com/devcontainers/python:3.10",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
