@@ -16,5 +16,16 @@ if ! grep -q "export PATH=\$PATH:/usr/local/go/bin" ~/.profile; then
   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
 fi
 
+# #check export before insert in .bashrc
+# if ! grep -q "export PATH=\$PATH:/usr/local/go/bin" ~/.bashrc; then
+#   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+# fi
+
+# if ! grep -q "export PATH=\$PATH:/usr/local/go/bin" /etc/profile.d/meu_path.sh; then
+#   echo 'export PATH=$PATH:/usr/local/go/bin' | sudo tee /etc/profile.d/meu_path.sh
+# fi
+
+
+
 echo "reinicie o terminal com Control D"
 

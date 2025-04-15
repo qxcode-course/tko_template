@@ -22,6 +22,27 @@ tko run  <arquivo_codigo>  # usando interface curses
 pipx upgrade tko
 ```
 
+## Configuração Inicial
+
+- Após o primeiro setup
+  - Aperte F1 e escolha: <Stop Current Workspace> para forçar um reboot completo
+- Após reiniciar o codespace
+- Crie sua pasta de atividades com o comando `tko init --remote [fup|ed|poo]`
+- Abra seu repositório com `tko open <pasta>`
+- Escolha a linguagem pretendida
+- Baixe alguma atividade navegando e usando o <Enter>
+- Entre na atividade com <Enter>
+- Use o atalho <e> para abrir os arquivos da atividade selecionada
+- O vscode vai sugerir instalar os plugins da linguagem. Aceite.
+
+## Comandos do bash
+
+- `cd <pasta>` para mudar de pasta
+- `cd ..` para subir um nível
+- `code <arquivo>` para abrir um arquivo pelo terminal
+- `control c` para matar um programa do terminal
+- `control d` para matar o terminal
+
 ## Comandos do Git
 
 - `git add <arquivo>`: Adiciona um arquivo ao stage
