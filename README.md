@@ -54,6 +54,13 @@ pipx upgrade tko
 - `git log`: Mostra o histórico de commits
 - `git clone <url>`: Clona um repositório remoto para uma pasta local
 
+## Git pela interface do vscode
+
+- Escolha a aba do `Source Control` ou `Control Shift G`
+- Clique no + para `stage all changes`, ou seja, marcar tudo pra ser salvo.
+- Escreva a mensagem no campo do commit e clique em `Commit` para salvar a versão na máquina virtual.
+- Clique em `Sync Changes` para enviar pro site.
+
 ## Resolvendo Conflitos
 
 - Antes de trabalhar num respositório, lembre de fazer o pull.
