@@ -3,7 +3,27 @@ nomeAluno: "Seu nome"
 matricula: "Digite sua matrícula aqui por obséquio"
 ---
 
-# Bom trabalho
+# Configurações iniciais no codespace
+
+```bash
+# instalando o tko
+pipx install tko
+
+cd scripts
+# instale algum compilador que vocês precise
+./install_go.sh # se voce for usar o go
+./install_ts.sh # se você for usar typescript
+```
+
+- Agora instale alguns plugins úteis
+  - Abra a aba de extensões ou Control - Shift - X
+  - Procure por Error Lens e clique em instalar
+
+- Abra as configurações do editor com control vírgula
+  - Na opção de Auto Save escolha After Delay
+
+- Mate o terminal com control D e reabra
+- Quando abrir o primeiro código na linguagem sugerida, o codespace vai perguntar se você quer instalar o plugin, aceite.
 
 ## TKO
 
