@@ -5,4 +5,4 @@ package-lock.json
 *.out
 *.exe
 .vscode
-
+*.tar.gz
