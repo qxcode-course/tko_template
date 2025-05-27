@@ -17,26 +17,28 @@ cd scripts
 
 - Agora instale alguns plugins úteis
   - Abra a aba de extensões ou Control - Shift - X
-  - Procure por Error Lens e clique em instalar
-
-- Abra as configurações do editor com control vírgula
+  - Procure e instale os seguintes plugins
+    - Error Lens
+    - Open Terminal Here
+- Abra as configurações do editor com Control vírgula
   - Na opção de Auto Save escolha After Delay
-
 - Mate o terminal com control D e reabra
 - Quando abrir o primeiro código na linguagem sugerida, o codespace vai perguntar se você quer instalar o plugin, aceite.
 
 ## TKO
 
 ```bash
-## Criando seu novo repositório
+## Já existem 3 pastas com 3 repositórios iniciados, fup, ed, poo
+## Você pode apagar os que não for utilizar
+## Se você precisar criar um repositório do zero, pode fazer com o seguinte comando
 tko init --remote [fup|ed|poo]
 
 ## Interagindo com seu repositório
 tko open <pasta>
 
 ## Rodando um código diretamente
-tko test <arquivo_codigo>  # usando interface default
-tko run  <arquivo_codigo>  # usando interface curses
+tko run <arquivo_codigo>  # usando interface default
+tko gui  <arquivo_codigo>  # usando interface curses
 
 ## Atualizando o tko
 pipx upgrade tko
