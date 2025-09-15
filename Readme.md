@@ -14,39 +14,24 @@ code --install-extension usernamehw.errorlens
 code --install-extension jeff-hughes.open-terminal-here
 ```
 
-Para golang
-```
-cd scripts
-./install_go.sh # se voce for usar o go
-```
+Para golang, java, cpp, c, basta você abrir um arquivo de linguagem e aceitar a instalação da extensão para vscode.
 
-Para typescript
+Para typescript:
+
 ```
 cd scripts
 ./install_ts.sh # se você for usar typescript
 ```
 
-Para python
-```bash
-# execute a seguinte linha no terminal para instalar a extensão
-code --install-extension ms-python.python
+Para python:
 
+```bash
 # Abra o arquivo de configurações do vscode para o projeto e adicione o seguinte parâmetro
 code .vscode/settings.json
 {
     "python.analysis.typeCheckingMode": "strict"
 }
 ```
-
-- Agora instale alguns plugins úteis
-  - Abra a aba de extensões ou Control - Shift - X
-  - Procure e instale os seguintes plugins
-    - Error Lens
-    - Open Terminal Here
-- Abra as configurações do editor com Control vírgula
-  - Na opção de Auto Save escolha After Delay
-- Mate o terminal com control D e reabra
-- Quando abrir o primeiro código na linguagem sugerida, o codespace vai perguntar se você quer instalar o plugin, aceite.
 
 ## TKO
 
@@ -70,19 +55,6 @@ tko gui  <arquivo_codigo>  # usando interface curses
 ## Atualizando o tko
 pipx upgrade tko
 ```
-
-## Configuração Inicial
-
-- Após o primeiro setup
-  - Aperte F1 e escolha: <Stop Current Workspace> para forçar um reboot completo
-- Após reiniciar o codespace
-- Crie sua pasta de atividades com o comando `tko init --remote [fup|ed|poo]`
-- Abra seu repositório com `tko open <pasta>`
-- Escolha a linguagem pretendida
-- Baixe alguma atividade navegando e usando o <Enter>
-- Entre na atividade com <Enter>
-- Use o atalho <e> para abrir os arquivos da atividade selecionada
-- O vscode vai sugerir instalar os plugins da linguagem. Aceite.
 
 ## Comandos do bash
 
