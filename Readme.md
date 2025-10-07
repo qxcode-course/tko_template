@@ -3,48 +3,53 @@ nomeAluno: "Seu nome"
 matricula: "Digite sua matrícula aqui por obséquio"
 ---
 
-## Se estiver no codespace
+# Instalando o TKO e configurando o repositório
+
+## Vou programar no meu setup local
+
+- Se for a primeira configuração
+  - Instale git, python, ide(vscode), compiladores
+  - Configure sua chave git ssh
+  - Configure o pipx
+    - `pipx ensurepath`
+    - Reinicie o terminal
+  - Instale o tko
+    - `pipx install tko`
+
+## Vou programar no Codespace
 
 ```bash
 # instalando o tko e extensões úteis
 ./setup_basic.sh
 
-# Para typescript:
+# Se for usar typescript
 ./setup_ts.sh
 
-# Para python:
+# Se for usar python:
 ./setup_py.sh
 ```
 
-## Estou programando no meu setup local:
-
-- Se for a primeira configuração
-  - Instale git, python, ide(vscode), compiladores
-  - Configure sua chave git ssh
-  - Instale o tko
-    - `pipx ensurepath`
-    - `pipx install tko`
-- Se já tiver tudo configurado
-  - Atualize o tko: `pipx install tko`
 
 ## Configurando o repositório do TKO
 
 ```bash
-# Atualize o tko
+# Se está com uma instalação antiga do tko,
+# por favor atualizar!
 pipx upgrade tko
 
-# Criar um repositório de atividades já definindo a fonte
+# Criar o repositório de atividades
 tko init -f tasks -l py -r poo -e acesso simples
 
-# Interagindo com seu repositório
+# Interagir com seu repositório
 tko open tasks
 ```
 
 ## Comandos do bash
 
 - `cd <pasta>` para mudar de pasta
+- `ls` para mostrar o conteúdo da pasta
 - `cd ..` para subir um nível
-- `code <arquivo>` para abrir um arquivo pelo terminal
+- `code <arquivo>` para abrir um arquivo ou pasta pelo terminal
 - `control c` para matar um programa do terminal
 - `control d` para matar o terminal
 
