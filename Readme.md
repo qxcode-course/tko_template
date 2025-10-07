@@ -3,52 +3,41 @@ nomeAluno: "Seu nome"
 matricula: "Digite sua matrícula aqui por obséquio"
 ---
 
-# Configurações iniciais no codespace
+## Se estiver no codespace
 
 ```bash
-# instalando o tko
-pipx install tko
+# instalando o tko e extensões úteis
+./setup_basic.sh
 
-# Instalando algumas extensões úteis para todas as linguagens
-code --install-extension usernamehw.errorlens
+# Para typescript:
+./setup_ts.sh
+
+# Para python:
+./setup_py.sh
 ```
 
-Para golang, java, cpp, c, basta você abrir um arquivo de linguagem e aceitar a instalação da extensão para vscode.
+## Estou programando no meu setup local:
 
-Para typescript:
+- Se for a primeira configuração
+  - Instale git, python, ide(vscode), compiladores
+  - Configure sua chave git ssh
+  - Instale o tko
+    - `pipx ensurepath`
+    - `pipx install tko`
+- Se já tiver tudo configurado
+  - Atualize o tko: `pipx install tko`
 
-```
-cd scripts
-./install_ts.sh # se você for usar typescript
-```
-
-Para python:
+## Configurando o repositório do TKO
 
 ```bash
-# Abra o arquivo de configurações do vscode para o projeto e adicione o seguinte parâmetro
-code .vscode/settings.json
-{
-    "python.analysis.typeCheckingMode": "strict"
-}
-```
-
-## TKO
-
-```bash
-## Se você precisar criar um repositório do zero, pode fazer com o seguinte comando
-
-# para criando um repositório de atividades já definindo a fonte
-tko init -f myrep -l py --remote poo --enable acesso simples
-
-## Interagindo com seu repositório
-tko open myrep
-
-## Rodando um código diretamente
-tko run <arquivo_codigo>  # usando interface default
-tko gui  <arquivo_codigo>  # usando interface curses
-
-## Atualizando o tko
+# Atualize o tko
 pipx upgrade tko
+
+# Criar um repositório de atividades já definindo a fonte
+tko init -f tasks -l py -r poo -e acesso simples
+
+# Interagindo com seu repositório
+tko open tasks
 ```
 
 ## Comandos do bash
@@ -79,14 +68,16 @@ pipx upgrade tko
 
 ## Resolvendo Conflitos
 
-- Antes de trabalhar num respositório, lembre de fazer o pull.
-- Se quando for fazer o push, der erro, tente as seguintes opções.
-  - git pull --ff-only
-  - git rebase
-  - git pull --no-rebase
-- Se não der certo, cole o erro no chatgpt e siga as instruções.
-- Se não der certo, mande o erro no grupo do telegram.
+- **Antes de começar a trabalhar**, atualize o repositório:
+  - `git pull --ff-only`
+  - (isso evita merges automáticos inesperados)
 
-## Lembre-se
-
-- Sua consciência é a melhor ferramenta contra o plágio.
+- **Se o push der erro**, o problema normalmente é que há commits novos no repositório remoto.
+  - Vamos puxar as atualizações e ver os arquivos que estão conflitando.
+    - `git pull --no-rebase`
+  - Veja como está seu repositório com `git status`. 
+  - Edite os arquivos marcados com ! ou “both modified”, escolhendo o que deve permanecer.
+  - Volte para o fluxo original
+    - `git add .`
+    - `git commit -m mensagem`
+    - `git push`
