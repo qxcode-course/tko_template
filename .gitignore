@@ -6,3 +6,4 @@ package-lock.json
 *.exe
 .vscode
 *.tar.gz
+cache
