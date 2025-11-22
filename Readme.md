@@ -20,13 +20,10 @@ matricula: "Digite sua matrícula aqui por obséquio"
 
 ```bash
 # instalando o tko e extensões úteis
-./setup_basic.sh
+# Escolha se quer usar python ou typescript
+# As outras linguagens c, c++, java, etc, já vem automaticamente na máquina virtual
+./setup.sh
 
-# Se for usar typescript
-./setup_ts.sh
-
-# Se for usar python:
-./setup_py.sh
 ```
 
 
@@ -38,7 +35,7 @@ matricula: "Digite sua matrícula aqui por obséquio"
 pipx upgrade tko
 
 # Criar o repositório de atividades
-tko init -f tasks -l py -r poo -e acesso simples
+tko init -f tasks -l py -r poo -e crud
 
 # Interagir com seu repositório
 tko open tasks
