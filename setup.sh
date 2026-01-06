@@ -3,9 +3,9 @@
 # Função para instalação básica
 setup_basic() {
     echo "Instalando ferramentas básicas..."
-    pipx install tko
-    code --install-extension usernamehw.errorlens
-    code --install-extension bierner.markdown-preview-github-styles
+    pipx install tko --force
+    code --install-extension usernamehw.errorlens --force
+    code --install-extension bierner.markdown-preview-github-styles --force
     echo "✓ Ferramentas básicas instaladas"
 }
 
@@ -20,7 +20,7 @@ setup_python() {
     "python.analysis.diagnosticMode": "workspace"
 }
 EOF
-    code --install-extension ms-python.python
+    code --install-extension ms-python.python --force
     echo "✓ Ambiente Python configurado"
 }
 
@@ -39,9 +39,6 @@ echo "========================================"
 echo "   Setup de Ambiente de Desenvolvimento"
 echo "========================================"
 echo ""
-
-# Configuração básica (sempre executada)
-setup_basic
 echo ""
 
 # Menu de opções
@@ -52,6 +49,10 @@ echo "3) Ambos (Python + TypeScript)"
 echo "4) Nenhum (apenas configuração básica)"
 echo ""
 read -p "Digite sua escolha [1-4]: " choice
+
+
+# Configuração básica (sempre executada)
+setup_basic
 
 case $choice in
     1)
