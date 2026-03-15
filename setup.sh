@@ -1,97 +1,91 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ==============================
-# Configurações
-# ==============================
-
 GO_VERSION="go1.26.0"
 GO_ARCH="linux-amd64"
 GO_TAR="${GO_VERSION}.${GO_ARCH}.tar.gz"
 GO_URL="https://go.dev/dl/${GO_TAR}"
-CACHE_DIR="${HOME}/.cache/dev-setup"
 
-# ==============================
-# Utilidades
-# ==============================
+log() { echo -e "\n==> $1"; }
 
-log() {
-    echo -e "\n==> $1"
-}
-
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
+command_exists() { command -v "$1" >/dev/null 2>&1; }
 
 ensure_path_export() {
     local line='export PATH=$PATH:/usr/local/go/bin'
     local file="$1"
-
     [[ -f "$file" ]] || touch "$file"
     grep -qxF "$line" "$file" || echo "$line" >> "$file"
 }
 
+write_if_missing() {
+    local file="$1"
+    local content="$2"
+
+    [[ -f "$file" ]] && return
+    mkdir -p "$(dirname "$file")"
+    printf "%s\n" "$content" > "$file"
+}
+
 install_vscode_extensions() {
-    command_exists code || return 0
+    command_exists code || return
 
     mapfile -t installed < <(code --list-extensions)
 
     for ext in "$@"; do
-        if printf '%s\n' "${installed[@]}" | grep -qx "$ext"; then
-            echo "✓ $ext já instalada"
-        else
-            echo "→ Instalando $ext"
-            code --install-extension "$ext"
-        fi
+        printf '%s\n' "${installed[@]}" | grep -qx "$ext" \
+            && echo "✓ $ext já instalada" \
+            || { echo "→ Instalando $ext"; code --install-extension "$ext"; }
     done
 }
 
+install_global_npm() {
+    command_exists npm || { echo "npm não encontrado"; return; }
+    npm install -g "$@"
+}
+
 # ==============================
-# Setup básico
+# tko
+# ==============================
+
+setup_tko() {
+    log "Instalando/atualizando tko"
+
+    command_exists pipx || { echo "pipx não encontrado"; exit 1; }
+
+    if pipx list | grep -qE 'package tko '; then
+        pipx upgrade tko
+    else
+        pipx install tko
+    fi
+}
+
+# ==============================
+# Básico
 # ==============================
 
 setup_basic() {
-    log "Instalando ferramentas básicas"
-
-    if command_exists pipx; then
-        if pipx list | grep -qE 'package tko '; then
-            echo "→ Atualizando tko"
-            pipx upgrade tko
-        else
-            echo "→ Instalando tko"
-            pipx install tko
-        fi
-    else
-        echo "pipx não encontrado. Pulando instalação do tko."
-    fi
+    log "Configurando ambiente básico"
 
     install_vscode_extensions \
         usernamehw.errorlens \
         bierner.markdown-preview-github-styles \
         tamasfe.even-better-toml
-
-    echo "✓ Básico concluído"
 }
-
 
 # ==============================
 # Python
 # ==============================
 
 setup_python() {
-    log "Configurando ambiente Python"
+    log "Configurando Python"
 
-    mkdir -p .vscode
-    cat > .vscode/settings.json <<EOF
-{
+    write_if_missing ".vscode/settings.json" \
+'{
   "python.analysis.typeCheckingMode": "strict",
   "python.analysis.diagnosticMode": "workspace"
-}
-EOF
+}'
 
     install_vscode_extensions ms-python.python
-
-    echo "✓ Python configurado"
 }
 
 # ==============================
@@ -99,16 +93,10 @@ EOF
 # ==============================
 
 setup_typescript() {
-    log "Configurando ambiente TypeScript"
+    log "Configurando TypeScript"
 
-    if command_exists npm; then
-        npm install -g typescript esbuild
-        npm install --save-dev @types/node readline-sync
-    else
-        echo "npm não encontrado. Pulando configuração TypeScript."
-    fi
-
-    echo "✓ TypeScript configurado"
+    install_global_npm typescript esbuild
+    npm install --save-dev @types/node readline-sync 2>/dev/null || true
 }
 
 # ==============================
@@ -118,55 +106,55 @@ setup_typescript() {
 setup_go() {
     log "Instalando Go ${GO_VERSION}"
 
-    mkdir -p "${CACHE_DIR}"
-    GO_FILE="${CACHE_DIR}/${GO_TAR}"
+    TMP="/tmp/${GO_TAR}"
 
-    if [[ ! -f "${GO_FILE}" ]]; then
-        log "Baixando ${GO_TAR}"
-        if command_exists curl; then
-            curl -fsSL "${GO_URL}" -o "${GO_FILE}"
-        else
-            echo "curl não encontrado."
-            exit 1
-        fi
-    else
-        log "Usando arquivo em cache"
-    fi
+    command_exists curl || { echo "curl não encontrado"; exit 1; }
+
+    curl -fsSL "${GO_URL}" -o "${TMP}"
 
     sudo rm -rf /usr/local/go
-    sudo tar -C /usr/local -xzf "${GO_FILE}"
+    sudo tar -C /usr/local -xzf "${TMP}"
+    rm -f "${TMP}"
 
     ensure_path_export ~/.profile
     ensure_path_export ~/.bashrc
 
     install_vscode_extensions golang.Go
-
-    echo "✓ Go instalado"
 }
 
 # ==============================
-# Execução
+# Menu
 # ==============================
 
 echo "========================================"
 echo "   Setup de Ambiente de Desenvolvimento"
 echo "========================================"
 
-echo "1) Python"
-echo "2) TypeScript"
-echo "3) Golang"
-echo "4) Apenas básico"
+echo "1) TKO (Instalar / Atualizar)"
+echo "2) Python"
+echo "3) TypeScript"
+echo "4) Golang"
 
 read -rp "Escolha [1-4]: " choice
 
-setup_basic
-
-case "${choice}" in
-    1) setup_python ;;
-    2) setup_typescript ;;
-    3) setup_go ;;
-    4) echo "Somente básico aplicado." ;;
-    *) echo "Opção inválida. Apenas básico aplicado." ;;
+case "$choice" in
+    1)
+        setup_tko
+        setup_basic
+        ;;
+    2)
+        setup_python
+        ;;
+    3)
+        setup_typescript
+        ;;
+    4)
+        setup_go
+        ;;
+    *)
+        echo "Opção inválida"
+        exit 1
+        ;;
 esac
 
 echo -e "\n✓ Setup concluído"
