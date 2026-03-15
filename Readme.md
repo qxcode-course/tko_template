@@ -38,7 +38,7 @@ pipx upgrade tko
 tko init
 
 # Adicionar a fonte remota de tarefas
-tko remote add fup @fup
+tko remote add fup "@fup"
 
 # Interagir com seu repositório
 tko open
