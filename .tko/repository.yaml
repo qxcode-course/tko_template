@@ -1,0 +1,27 @@
+version: '0.2'
+sources:
+- name: sandbox
+  target: base
+  index: ../README.md
+  type: local
+  writeable: true
+  quests: null
+  tasks: null
+- name: fup
+  target: https://github.com/qxcodefup/arcade.git
+  index: README.md
+  type: git
+  writeable: false
+  quests: null
+  tasks: null
+expanded:
+- fup@if1
+flags:
+  inbox: all
+  panel: help
+  show_panel: 'false'
+  task_graph_mode: executions
+  show_time: 'true'
+lang: go
+selected: fup@max
+selected_index: 3

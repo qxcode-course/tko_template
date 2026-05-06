@@ -1,0 +1,12 @@
+2026-05-05 18:50:57, MOVE, v:1, k:fup@max, mode:DOWN
+2026-05-05 18:50:59, MOVE, v:1, k:fup@max, mode:PICK
+2026-05-05 18:51:56, EXEC, v:1, k:fup@max, mode:FULL, rate:0, size:5
+2026-05-05 18:52:33, MOVE, v:1, k:fup@max, mode:BACK
+2026-05-05 18:52:36, MOVE, v:1, k:fup@max, mode:PICK
+2026-05-05 18:52:56, EXEC, v:1, k:fup@max, mode:FULL, rate:0
+2026-05-05 18:53:31, EXEC, v:1, k:fup@max, mode:FULL, rate:0
+2026-05-05 18:53:48, EXEC, v:1, k:fup@max, mode:FULL, rate:0, size:5
+2026-05-05 18:53:26, MOVE, v:1, k:fup@max, mode:EDIT
+2026-05-05 18:50:57, MOVE, v:1, k:fup@max, mode:EDIT
+2026-05-05 18:53:47, MOVE, v:1, k:fup@max, mode:EDIT
+2026-05-05 18:53:48, MOVE, v:1, k:fup@max, mode:EDIT

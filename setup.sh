@@ -66,6 +66,8 @@ setup_tko() {
 setup_basic() {
     log "Configurando ambiente básico"
 
+    sudo install -m 755 sync.sh /usr/local/bin/sync.sh
+
     install_vscode_extensions \
         usernamehw.errorlens \
         bierner.markdown-preview-github-styles \
