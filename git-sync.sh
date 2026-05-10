@@ -54,7 +54,7 @@ confirm() {
   local answer
 
   if [[ "$default_yes" == "true" ]]; then
-    read -r -p "$prompt [Y/n] (Enter confirma):" answer
+    read -r -p "$prompt [Y/n] (Enter confirma): " answer
 
     case "${answer,,}" in
       ""|y|yes|s|sim)
@@ -231,11 +231,30 @@ commit_local_changes() {
 
   echo
   echo "Quantidade de arquivos alterados: $changed_files"
+  echo
+
+  warn "Escreva uma mensagem curta descrevendo o que mudou."
+  echo
+  echo "Exemplos:"
+  echo "  corrigir exercício de listas"
+  echo "  adicionar atividade da aula 3"
+  echo "  resolver bug no menu"
 
   local msg
-  msg="$(ask "Mensagem do commit: ")"
 
-  msg="${msg:-$DEFAULT_COMMIT_MESSAGE}"
+  while true; do
+    echo
+    msg="$(ask "Mensagem do commit: ")"
+
+    msg="$(echo "$msg" | xargs)"
+
+    if [[ -z "$msg" ]]; then
+      error "A mensagem de commit não pode ser vazia."
+      continue
+    fi
+
+    break
+  done
 
   run git commit -m "$msg"
 
