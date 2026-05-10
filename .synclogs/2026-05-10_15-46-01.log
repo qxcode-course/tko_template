@@ -1,0 +1,33 @@
+
+[1m========================================[0m
+[1mSYNC EDUCACIONAL GIT[0m
+[1m========================================[0m
+[33m[AVISO][0m Esse script executa comandos git automaticamente.
+[33m[AVISO][0m Leia as mensagens antes de confirmar operações.
+[33m[AVISO][0m Pressione Ctrl+C para cancelar.
+
+[34m[1m==>[0m [1mLog salvo em:  .synclogs/2026-05-10_15-46-01.log[0m
+
+[34m[1m==>[0m [1mValidando ambiente[0m
+[32m[OK][0m Repositório git detectado
+
+[34m[1m==>[0m [1mVerificando conexão com o servidor[0m
+[32m[OK][0m Conexão com servidor OK
+
+[34m[1m==>[0m [1mVerificando identidade do git[0m
+[32m[OK][0m Identidade git configurada
+
+Branch atual: [1mmain[0m
+
+[34m[1m==>[0m [1mResumo do repositório[0m
+  ?? = arquivo novo
+   M = arquivo modificado
+   D = arquivo deletado
+  UU = conflito de merge
+[32m-> git status --short[0m
+ M git-sync.sh
+?? .synclogs/
+?? banana
+
+[34m[1m==>[0m [1mVerificando alterações locais[0m
+Deseja salvar essas alterações agora? [Y/n] (Enter confirma): 

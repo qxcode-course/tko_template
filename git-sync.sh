@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 # =========================================================
 # CONFIG
 # =========================================================
 readonly DEFAULT_COMMIT_MESSAGE="sync update"
+readonly ALLOWED_BRANCH="main"
+readonly GIT="git"
+
+# =========================================================
+# LOGGING
+# =========================================================
+
+readonly LOG_DIR=".synclogs"
+readonly LOG_TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
+readonly LOG_FILE="$LOG_DIR/$LOG_TIMESTAMP.log"
+
+mkdir -p "$LOG_DIR"
+
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 # =========================================================
 # COLORS
@@ -17,10 +31,16 @@ readonly BOLD='\033[1m'
 readonly RESET='\033[0m'
 
 # =========================================================
+# ERROR HANDLING
+# =========================================================
+trap 'error "Falha inesperada."' ERR
+trap 'echo; warn "Operação cancelada pelo usuário."' INT
+
+# =========================================================
 # UI
 # =========================================================
 step() {
-  printf "\n%b\n" "${BLUE}${BOLD}==>${RESET} ${BOLD}$1${RESET}"
+  printf "%b\n" "${BLUE}${BOLD}==>${RESET} ${BOLD}$1${RESET}"
 }
 
 success() {
@@ -82,24 +102,54 @@ confirm() {
 # GIT HELPERS
 # =========================================================
 is_merge_in_progress() {
-  git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+  $GIT rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
 }
 
 has_merge_conflicts() {
-  git diff --name-only --diff-filter=U | grep -q .
+  $GIT diff --name-only --diff-filter=U | grep -q .
 }
 
 has_local_changes() {
-  ! git diff --quiet || ! git diff --cached --quiet
+  ! $GIT diff --quiet || ! $GIT diff --cached --quiet
 }
 
 has_remote() {
-  git remote get-url origin >/dev/null 2>&1
+  $GIT remote get-url origin >/dev/null 2>&1
 }
 
 has_upstream() {
-  git rev-parse --abbrev-ref --symbolic-full-name "@{u}" \
+  $GIT rev-parse --abbrev-ref --symbolic-full-name "@{u}" \
     >/dev/null 2>&1
+}
+
+has_commits_to_push() {
+  if ! has_upstream; then
+    return 0
+  fi
+
+  [[ "$($GIT rev-list --count "@{u}..HEAD")" -gt 0 ]]
+}
+
+remote_has_updates() {
+  local branch="$1"
+
+  local ahead_behind
+  ahead_behind="$(
+    $GIT rev-list --left-right --count HEAD..."origin/$branch"
+  )"
+
+  local behind
+  behind="$(echo "$ahead_behind" | awk '{print $2}')"
+
+  [[ "$behind" -gt 0 ]]
+}
+
+safe_ls_remote() {
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 15 $GIT ls-remote origin >/dev/null 2>&1
+  else
+    $GIT ls-remote origin >/dev/null 2>&1
+  fi
 }
 
 # =========================================================
@@ -108,7 +158,7 @@ has_upstream() {
 validate_environment() {
   step "Validando ambiente"
 
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if ! $GIT rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     error "Esse diretório não é um repositório git."
     exit 1
   fi
@@ -124,7 +174,7 @@ validate_remote() {
     exit 1
   fi
 
-  if ! git ls-remote origin >/dev/null 2>&1; then
+  if ! safe_ls_remote; then
     error "Não foi possível conectar ao servidor remoto."
     warn "Verifique sua internet ou permissões."
     exit 1
@@ -136,11 +186,17 @@ validate_remote() {
 get_current_branch() {
   local branch
 
-  branch="$(git rev-parse --abbrev-ref HEAD)"
+  branch="$($GIT rev-parse --abbrev-ref HEAD)"
 
   if [[ "$branch" == "HEAD" ]]; then
     error "Você está em HEAD destacado."
     warn "Volte para uma branch antes de continuar."
+    exit 1
+  fi
+
+  if [[ "$branch" != "$ALLOWED_BRANCH" ]]; then
+    error "Branch inválida: $branch"
+    warn "Esse script deve ser executado apenas na branch '$ALLOWED_BRANCH'."
     exit 1
   fi
 
@@ -156,8 +212,8 @@ setup_git_identity() {
   local git_user_name
   local git_user_email
 
-  git_user_name="$(git config --get user.name || true)"
-  git_user_email="$(git config --get user.email || true)"
+  git_user_name="$($GIT config --get user.name || true)"
+  git_user_email="$($GIT config --get user.email || true)"
 
   if [[ -z "$git_user_name" ]]; then
     local name
@@ -170,7 +226,7 @@ setup_git_identity() {
       exit 1
     fi
 
-    run git config user.name "$name"
+    run $GIT config user.name "$name"
   fi
 
   if [[ -z "$git_user_email" ]]; then
@@ -184,7 +240,7 @@ setup_git_identity() {
       exit 1
     fi
 
-    run git config user.email "$email"
+    run $GIT config user.email "$email"
   fi
 
   success "Identidade git configurada"
@@ -194,15 +250,18 @@ setup_git_identity() {
 # STATUS
 # =========================================================
 show_status() {
-  step "Resumo do repositório"
-
-  echo
-  run git status --short || true
+  step "Resumo do repositório (?? = arquivo novo, M = modificado, D = deletado, UU = conflito)"
+  run $GIT status --short || true
 }
 
 # =========================================================
 # COMMIT
 # =========================================================
+git_commit_changes() {
+  local msg="$1"
+  run $GIT commit -m "$msg"
+}
+
 commit_local_changes() {
   step "Verificando alterações locais"
 
@@ -211,42 +270,34 @@ commit_local_changes() {
     return
   fi
 
-  echo
-  warn "Arquivos alterados encontrados:"
-  echo
-
-  git status --short
-
-  echo
-
   if ! confirm "Deseja salvar essas alterações agora?"; then
     warn "Operação cancelada pelo usuário."
     exit 0
   fi
 
-  run git add -A
+  run $GIT add -A
+
+  if $GIT diff --cached --quiet; then
+    warn "Nenhuma alteração pronta para commit."
+    return
+  fi
+
+  warn "Resumo das alterações:"
+  run $GIT diff --cached --stat
 
   local changed_files
-  changed_files="$(git diff --cached --name-only | wc -l | tr -d ' ')"
+  changed_files="$($GIT diff --cached --name-only | wc -l | tr -d ' ')"
 
-  echo
   echo "Quantidade de arquivos alterados: $changed_files"
-  echo
-
   warn "Escreva uma mensagem curta descrevendo o que mudou."
-  echo
-  echo "Exemplos:"
-  echo "  corrigir exercício de listas"
-  echo "  adicionar atividade da aula 3"
-  echo "  resolver bug no menu"
 
   local msg
 
   while true; do
-    echo
     msg="$(ask "Mensagem do commit: ")"
 
-    msg="$(echo "$msg" | xargs)"
+    msg="${msg#"${msg%%[![:space:]]*}"}"
+    msg="${msg%"${msg##*[![:space:]]}"}"
 
     if [[ -z "$msg" ]]; then
       error "A mensagem de commit não pode ser vazia."
@@ -256,7 +307,7 @@ commit_local_changes() {
     break
   done
 
-  run git commit -m "$msg"
+  git_commit_changes "$msg"
 
   success "Alterações salvas"
 }
@@ -268,70 +319,63 @@ resolve_merge_conflict() {
   step "Conflitos detectados"
 
   echo
-  warn "Os mesmos arquivos foram alterados localmente e no servidor."
+  warn "Você e o servidor modificaram os mesmos arquivos."
+  warn "O Git precisa saber qual versão deve ser mantida."
   echo
 
-  git diff --name-only --diff-filter=U
+  local conflicts
+  conflicts="$($GIT diff --name-only --diff-filter=U)"
 
-  echo
+  echo "$conflicts"
 
-  while true; do
-    echo "Escolha uma opção:"
+  while read -r file; do
+    [[ -z "$file" ]] && continue
+
     echo
-    echo "  1) Manter MINHA versão"
-    echo "  2) Manter versão do SERVIDOR"
-    echo "  3) Resolver manualmente"
-    echo
+    echo "Arquivo em conflito:"
+    echo "  $file"
 
-    local choice
-    choice="$(ask "> ")"
+    while true; do
+      echo
+      echo "  1) Manter MINHA versão"
+      echo "  2) Manter versão do SERVIDOR"
+      echo "  3) Resolver manualmente"
+      echo
 
-    case "$choice" in
-      1)
-        warn "Sua versão será mantida."
-        warn "As alterações do servidor nesses arquivos serão descartadas."
+      local choice
+      choice="$(ask "> ")"
 
-        if ! confirm "Deseja continuar?"; then
-          continue
-        fi
+      case "$choice" in
+        1)
+          run $GIT checkout --ours -- "$file"
+          run $GIT add "$file"
+          break
+          ;;
 
-        run git checkout --ours .
-        run git add -A
-        run git commit -m "merge: keep local version"
+        2)
+          run $GIT checkout --theirs -- "$file"
+          run $GIT add "$file"
+          break
+          ;;
 
-        success "Conflitos resolvidos usando sua versão"
-        break
-        ;;
+        3)
+          warn "Resolva manualmente e execute novamente."
+          exit 0
+          ;;
 
-      2)
-        warn "A versão do servidor será mantida."
-        warn "Suas alterações locais nesses arquivos serão descartadas."
+        *)
+          error "Opção inválida"
+          ;;
+      esac
+    done
 
-        if ! confirm "Deseja continuar?"; then
-          continue
-        fi
+  done <<< "$conflicts"
 
-        run git checkout --theirs .
-        run git add -A
-        run git commit -m "merge: keep remote version"
+  if ! $GIT diff --cached --quiet; then
+    run $GIT commit -m "resolve merge conflicts"
+  fi
 
-        success "Conflitos resolvidos usando versão do servidor"
-        break
-        ;;
-
-      3)
-        echo
-        warn "Resolva os conflitos manualmente."
-        warn "Depois execute o script novamente."
-
-        exit 0
-        ;;
-
-      *)
-        error "Opção inválida"
-        ;;
-    esac
-  done
+  success "Conflitos resolvidos"
 }
 
 handle_pending_merge() {
@@ -346,10 +390,8 @@ handle_pending_merge() {
     return
   fi
 
-  warn "Finalizando merge pendente"
-
-  run git add -A
-  run git commit --no-edit
+  run $GIT add -A
+  run $GIT commit --no-edit
 
   success "Merge finalizado"
 }
@@ -362,9 +404,9 @@ sync_with_remote() {
 
   step "Baixando atualizações do servidor"
 
-  run git fetch origin
+  run $GIT fetch origin
 
-  if git diff --quiet HEAD "origin/$branch"; then
+  if ! remote_has_updates "$branch"; then
     success "Seu repositório já está atualizado"
     return
   fi
@@ -372,7 +414,7 @@ sync_with_remote() {
   warn "Atualizações encontradas no servidor"
 
   echo
-  echo "As atualizações serão integradas ao seu repositório."
+  warn "Pressione Ctrl+C para cancelar."
   echo
 
   if ! confirm "Deseja continuar?"; then
@@ -381,18 +423,30 @@ sync_with_remote() {
   fi
 
   set +e
-  run git pull --no-rebase origin "$branch"
-  local pull_status=$?
+
+  # Primeiro tenta fast-forward puro
+  run $GIT merge --ff-only "origin/$branch"
+  local merge_status=$?
+
+  # Se não conseguir fast-forward, tenta merge normal
+  if [[ $merge_status -ne 0 ]]; then
+    warn "Fast-forward não foi possível."
+    warn "Tentando merge automático."
+
+    run $GIT merge "origin/$branch"
+    merge_status=$?
+  fi
+
   set -e
 
-  if [[ $pull_status -ne 0 ]]; then
+  if [[ $merge_status -ne 0 ]]; then
     if is_merge_in_progress; then
       resolve_merge_conflict
       return
     fi
 
     error "Erro ao atualizar repositório"
-    exit "$pull_status"
+    exit "$merge_status"
   fi
 
   success "Atualizações recebidas"
@@ -406,13 +460,35 @@ push_changes() {
 
   step "Enviando alterações para o servidor"
 
+  if ! has_commits_to_push; then
+    success "Nenhum commit novo para enviar"
+    return
+  fi
+
   if has_upstream; then
-    run git push
+    if ! $GIT push --dry-run >/dev/null 2>&1; then
+      error "Push rejeitado pelo servidor."
+      exit 1
+    fi
+
+    run $GIT push
   else
-    run git push -u origin "$branch"
+    run $GIT push -u origin "$branch"
   fi
 
   success "Alterações enviadas"
+}
+
+# =========================================================
+# SUMMARY
+# =========================================================
+show_final_summary() {
+  step "Resumo final"
+
+  printf "%b\n" "${GREEN}✓${RESET} alterações salvas"
+  printf "%b\n" "${GREEN}✓${RESET} repositório atualizado"
+  printf "%b\n" "${GREEN}✓${RESET} alterações enviadas"
+  step "Log salvo em:  $LOG_FILE"
 }
 
 # =========================================================
@@ -423,6 +499,11 @@ main() {
   printf "%b\n" "${BOLD}========================================${RESET}"
   printf "%b\n" "${BOLD}SYNC EDUCACIONAL GIT${RESET}"
   printf "%b\n" "${BOLD}========================================${RESET}"
+
+  warn "Esse script executa comandos git automaticamente."
+  warn "Leia as mensagens antes de confirmar operações."
+  warn "Pressione Ctrl+C para cancelar."
+  step "Log salvo em:  $LOG_FILE"
 
   validate_environment
   validate_remote
@@ -440,9 +521,9 @@ main() {
   sync_with_remote "$branch"
   push_changes "$branch"
 
-  echo
+  show_final_summary
+
   printf "%b\n" "${GREEN}${BOLD}Sync concluído com sucesso.${RESET}"
-  echo
 }
 
 main "$@"
