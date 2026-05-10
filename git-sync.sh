@@ -123,6 +123,11 @@ sync_with_remote() {
   echo "==> Fetching origin/$branch"
   git fetch origin
 
+  if git diff --quiet HEAD "origin/$branch"; then
+    echo "Sem novidades no servidor remoto"
+    return
+  fi
+
   echo "==> Merging origin/$branch"
   set +e
   git merge "origin/$branch"
@@ -143,8 +148,10 @@ commit_local_changes() {
   git add -A
 
   if ! git diff --cached --quiet; then
+    local changed_files
     local msg
-    msg="$(ask "Mensagem de commit: ")"
+    changed_files="$(git diff --cached --name-only | wc -l | tr -d ' ')"
+    msg="$(ask "Qtd arquivos alterados nesse commit: $changed_files, insira a mensagem de commit: ")"
     msg="${msg:-sync update}"
     git commit -m "$msg"
   else
