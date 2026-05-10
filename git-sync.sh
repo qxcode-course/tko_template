@@ -50,18 +50,32 @@ ask() {
 
 confirm() {
   local prompt="$1"
+  local default_yes="${2:-true}"
   local answer
 
-  read -r -p "$prompt [s/N]: " answer
+  if [[ "$default_yes" == "true" ]]; then
+    read -r -p "$prompt [Y/n] (Enter confirma):" answer
 
-  case "${answer,,}" in
-    s|sim|y|yes)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
+    case "${answer,,}" in
+      ""|y|yes|s|sim)
+        return 0
+        ;;
+      *)
+        return 1
+        ;;
+    esac
+  else
+    read -r -p "$prompt [y/N]: " answer
+
+    case "${answer,,}" in
+      y|yes|s|sim)
+        return 0
+        ;;
+      *)
+        return 1
+        ;;
+    esac
+  fi
 }
 
 # =========================================================
